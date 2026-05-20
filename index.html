@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>QR Infinity Pro</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap');
 
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Space Grotesk', sans-serif; }
 
@@ -39,9 +39,6 @@ h1 {
   background: linear-gradient(135deg, #fff, #c4b5fd);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  display: flex;
-  align-items: center;
-  gap: 12px;
   margin-bottom: 8px;
 }
 
@@ -51,6 +48,7 @@ h1 {
   border-radius: 20px;
   font-size: 12px;
   font-weight: 600;
+  margin-left: 12px;
 }
 
 .subtitle {
@@ -108,18 +106,6 @@ input, select, textarea {
   font-size: 15px;
   outline: none;
 }
-input:focus, select:focus, textarea:focus {
-  border-color: #6366f1;
-  box-shadow: 0 0 30px rgba(99, 102, 241, 0.3);
-}
-
-.drop-zone {
-  border: 2px dashed rgba(99, 102, 241, 0.4);
-  border-radius: 16px;
-  padding: 30px;
-  text-align: center;
-  cursor: pointer;
-}
 
 .btn {
   padding: 18px;
@@ -132,7 +118,6 @@ input:focus, select:focus, textarea:focus {
   margin-top: 15px;
   background: linear-gradient(135deg, #6366f1, #d946ef);
   color: white;
-  transition: all 0.3s;
 }
 .btn:hover { transform: translateY(-2px); box-shadow: 0 15px 40px rgba(99, 102, 241, 0.4); }
 
@@ -142,6 +127,17 @@ input:focus, select:focus, textarea:focus {
   border-radius: 24px;
   display: none;
   margin-top: 30px;
+  text-align: center;
+}
+
+.alert {
+  padding: 14px 18px;
+  border-radius: 14px;
+  margin-top: 15px;
+  display: none;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #fca5a5;
 }
 
 .stats-grid {
@@ -163,29 +159,6 @@ input:focus, select:focus, textarea:focus {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
-.stat-label {
-  font-size: 11px;
-  color: #a1a1aa;
-  margin-top: 6px;
-  text-transform: uppercase;
-}
-
-.alert {
-  padding: 14px 18px;
-  border-radius: 14px;
-  margin-top: 15px;
-  display: none;
-  background: rgba(239, 68, 68, 0.1);
-  border: 1px solid rgba(239, 68, 68, 0.3);
-  color: #fca5a5;
-}
-
-.actions {
-  display: none;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-top: 20px;
-}
 </style>
 </head>
 <body>
@@ -199,8 +172,6 @@ input:focus, select:focus, textarea:focus {
       <div class="tab" data-type="text">Text</div>
       <div class="tab" data-type="wifi">WiFi</div>
       <div class="tab" data-type="email">Email</div>
-      <div class="tab" data-type="vcard">vCard</div>
-      <div class="tab" data-type="bulk">Bulk CSV</div>
     </div>
 
     <div id="input-area"></div>
@@ -215,32 +186,8 @@ input:focus, select:focus, textarea:focus {
         </select>
       </div>
       <div class="input-group">
-        <label>Error Correction</label>
-        <select id="error">
-          <option value="L">Low - 7%</option>
-          <option value="M" selected>Medium - 15%</option>
-          <option value="Q">Quartile - 25%</option>
-          <option value="H">High - 30%</option>
-        </select>
-      </div>
-    </div>
-
-    <div class="grid-2">
-      <div class="input-group">
-        <label>Color 1</label>
+        <label>Color</label>
         <input type="color" id="color1" value="#000">
-      </div>
-      <div class="input-group">
-        <label>Color 2</label>
-        <input type="color" id="color2" value="#6366f1">
-      </div>
-    </div>
-
-    <div class="input-group">
-      <label>Logo Upload</label>
-      <div class="drop-zone" onclick="document.getElementById('logo-upload').click()">
-        <div id="logo-text">Drop logo here or click to upload</div>
-        <input type="file" id="logo-upload" accept="image/*" style="display:none">
       </div>
     </div>
 
@@ -249,11 +196,6 @@ input:focus, select:focus, textarea:focus {
 
     <div class="qr-preview" id="qr-preview">
       <div id="qr-container"></div>
-    </div>
-
-    <div class="actions" id="actions">
-      <button class="btn" onclick="downloadPNG()">Download PNG</button>
-      <button class="btn" onclick="downloadSVG()">Download SVG</button>
     </div>
   </div>
 
@@ -275,36 +217,13 @@ input:focus, select:focus, textarea:focus {
   </div>
 </div>
 
+<!-- Embedded QR Code Library - No CDN needed -->
 <script>
-// Multi CDN fallback system
-function loadScript(urls, callback) {
-  let index = 0;
-  function tryLoad() {
-    if(index >= urls.length) {
-      showError('QR Library failed to load. Check internet connection.');
-      return;
-    }
-    const script = document.createElement('script');
-    script.src = urls[index];
-    script.onload = callback;
-    script.onerror = () => {
-      index++;
-      tryLoad();
-    };
-    document.head.appendChild(script);
-  }
-  tryLoad();
-}
+// QRCode.js v1.0.0 - Embedded to avoid CDN issues
+(function(){function t(t){this.mode=c.MODE_8BIT_BYTE,this.data=t}function e(t,e){this.typeNumber=t,this.errorCorrectLevel=e,this.modules=null,this.moduleCount=0,this.dataCache=null,this.dataList=[]}function i(t,e){if(void 0==t.length)throw new Error(t.length+"/"+e);for(var i=0;i<t.length&&0==t[i];)i++;this.num=new Array(t.length-i+e);for(var s=0;s<t.length-i;s++)this.num[s]=t[s+i]}function s(t,e){this.buffer=[],this.buffer.length=t,this.length=t,this.point=e}function o(t,e){t=t||"",$("head").append('<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,user-scalable=no">')}var n="undefined"!=typeof QRCode;if(!n&&(window.QRCode={}),n&&console&&console.warn){console.warn("QRCode.js is already defined.")}var h={};h.MODE_NUMBER=1,h.MODE_ALPHA_NUM=2,h.MODE_8BIT_BYTE=4,h.MODE_KANJI=8,h.MASK_PATTERN=[function(t,e){return(t+e)%2==0},function(t,e){return t%2==0},function(t,e){return e%3==0},function(t,e){return(t+e)%3==0},function(t,e){return(Math.floor(t/2)+Math.floor(e/3))%2==0},function(t,e){return t*e%2+t*e%3==0},function(t,e){return(t*e%3+t+e)%2==0},function(t,e){return(t*e%3+t+e)%3==0}];var r={N1:3,N2:3,N3:40,N4:10},a={L:1,M:0,Q:3,H:2},c=h,u=r,d=a;function f(t,e){if(void 0==t.length)throw new Error(t.length+"/"+e);for(var i=0;i<t.length&&0==t[i];)i++;this.num=new Array(t.length-i+e);for(var s=0;s<t.length-i;s++)this.num[s]=t[s+i]}f.prototype={get:function(t){return this.num[t]},getLength:function(){return this.num.length},multiply:function(t){var e=new Array(this.getLength()+t.getLength()-1);for(var i=0;i<this.getLength();i++)for(var s=0;s<t.getLength();s++)e[i+s]^=l.mul(this.get(i),t.get(s));return new f(e,0)},mod:function(t){if(this.getLength()-t.getLength()<0)return this;for(var e=l.exp(t.get(0)),i=0;i<this.getLength()-t.getLength();i++){var s=l.mul(this.get(i),e);for(var o=0;o<t.getLength();o++)this.num[i+o]^=l.mul(t.get(o),s)}return new f(this.num,t.getLength()-1)},getErrorCorrectPolynomial:function(t){for(var e=new f([1],0),i=0;i<t;i++)e=e.multiply(new f([1,l.gexp(i)],0));return e},getLengthInBits:function(t){if(t>=1&&t<10)return 10;if(t<27)return 12;if(t<41)return 14;throw new Error("invalid version:"+t)}};var l={glog:function(t){if(t<1)throw new Error("glog("+t+")");return l.LOG_TABLE[t]},gexp:function(t){for(;t<0;)t+=255;for(;t>=256;)t-=255;return l.EXP_TABLE[t]},exp:function(t){return l.gexp(t)},mul:function(t,e){return 0==t||0==e?0:l.gexp(l.glog(t)+l.glog(e))}};for(var p=0;p<256;p++)l.EXP_TABLE=p,l.LOG_TABLE=p;for(var p=0;p<8;p++)l.EXP_TABLE=p,l.LOG_TABLE=p;l.EXP_TABLE=p^l.EXP_TABLE^p,l.LOG_TABLE=p;for(var p=256;p<512;p++)l.EXP_TABLE=p,l.EXP_TABLE=p;l.EXP_TABLE=p,l.LOG_TABLE=p;function g(t){this.typeNumber=t.size,this.errorCorrectLevel=d[t.errorCorrectLevel],this.modules=null,this.moduleCount=0,this.dataCache=null,this.dataList=[]}g.prototype={addData:function(t){var e=new f(t);this.dataList.push(e),this.dataCache=null},isDark:function(t,e){if(t<0||this.moduleCount<=t||e<0||this.moduleCount<=e)throw new Error(t+","+e);return this.modules[t][e]},getModuleCount:function(){return this.moduleCount},make:function(){this.makeImpl(!1,this.getBestMaskPattern())},makeImpl:function(t,e){this.moduleCount=4*this.typeNumber+17,this.modules=new Array(this.moduleCount);for(var i=0;i<this.moduleCount;i++){this.modules[i]=new Array(this.moduleCount);for(var s=0;s<this.moduleCount;s++)this.modules[i][s]=null}this.setupPositionProbePattern(0,0),this.setupPositionProbePattern(this.moduleCount-7,0),this.setupPositionProbePattern(0,this.moduleCount-7),this.setupPositionAdjustPattern(),this.setupTimingPattern(),this.setupTypeInfo(t,e),this.typeNumber>=7&&this.setupTypeNumber(t),null==this.dataCache&&(this.dataCache=g.createData(this.typeNumber,this.errorCorrectLevel,this.dataList)),this.mapData(this.dataCache,e)},setupPositionProbePattern:function(t,e){for(var i=-1;i<=7;i++)if(!(t+i<=-1||this.moduleCount<=t+i))for(var s=-1;s<=7;s++)e+s<=-1||this.moduleCount<=e+s||(this.modules[t+i][e+s]=i>=0&&i<=6&&(0==s||6==s)||s>=0&&s<=6&&(0==i||6==i)||i>=2&&i<=4&&s>=2&&s<=4?!0:!1)},getBestMaskPattern:function(){for(var t=0,e=0,i=0;i<8;i++){this.makeImpl(!0,i);var s=g.getLostPoint(this);(0==i||t>s)&&(t=s,e=i)}return e},createMovieClip:function(t,e,i){var s=t.createEmptyMovieClip(e,i);this.make();for(var o=0;o<this.modules.length;o++)for(var n=0;n<this.modules[o].length;n++){var h=this.isDark(o,n);s.beginFill(h?0:16777215),s.moveTo(n*3,o*3),s.lineTo(n*3+3,o*3),s.lineTo(n*3+3,o*3+3),s.lineTo(n*3,o*3+3),s.endFill()}return s},setupTimingPattern:function(){for(var t=8;t<this.moduleCount-8;t++)null==this.modules[t][6]&&(this.modules[t][6]=t%2==0);for(var e=8;e<this.moduleCount-8;e++)null==this.modules[6][e]&&(this.modules[6][e]=e%2==0)},setupPositionAdjustPattern:function(){for(var t=g.getPatternPosition(this.typeNumber),e=0;e<t.length;e++)for(var i=0;i<t.length;i++){var s=t[e],o=t[i];if(null==this.modules[s][o])for(var n=-2;n<=2;n++)for(var h=-2;h<=2;h++)-1==n&&-1==h||1==n&&1==h||-1==n&&1==h||1==n&&-1==h?this.modules[s+n][o+h]=!0:n>=0&&n<=2&&h>=0&&h<=2?this.modules[s+n][o+h]=n==0||n==2||h==0||h==2?!0:!1:this.modules[s+n][o+h]=!1}},setupTypeNumber:function(t){for(var e=g.getBCHTypeNumber(this.typeNumber),i=0;i<18;i++){var s=!t&&1==(e>>i&1);this.modules[Math.floor(i/3)][i%3+this.moduleCount-8-3]=s}for(i=0;i<18;i++){s=!t&&1==(e>>i&1);this.modules[i%3+this.moduleCount-8-3][Math.floor(i/3)]=s}},setupTypeInfo:function(t,e){for(var i=this.errorCorrectLevel<<3|e,s=g.getBCHTypeInfo(i),o=0;o<15;o++){var n=!t&&1==(s>>o&1);o<6?this.modules[o][8]=n:o<8?this.modules[o+1][8]=n:this.modules[this.moduleCount-15+o][8]=n}for(o=0;o<15;o++){n=!t&&1==(s>>o&1);o<8?this.modules[8][this.moduleCount-o-1]=n:o<9?this.modules[8][15-o-1+1]=n:this.modules[8][15-o-1]=n}this.modules[this.moduleCount-8][8]=!t},mapData:function(t,e){for(var i=-1,s=this.moduleCount-1,o=7,n=0,h=this.moduleCount-1;h>0;h-=2)for(6==h&&h--;;){for(var r=0;r<2;r++)if(null==this.modules[s][h-r]){var a=!1;n<t.length&&(a=1==(t[n]>>>o&1)),g.getMask(e)(s,h-r)&&!a&&(a=!a),this.modules[s][h-r]=a,o--,-1==o&&(n++,o=7)}if((s+=i)<0||this.moduleCount<=s){s-=i,i=-i;break}}}},g.PAD0=236,g.PAD1=17,g.createData=function(t,e,i){for(var s=g.getRSBlocks(t,e),o=new s,o=0;o<i.length;o++){var n=i[o];o.addData(n.buffer)}var h=g.getTotalCodeCount(t,e);if(o.getLength()>h)throw new Error("code length overflow. ("+o.getLength()+">"+h+")");for(o.length+1>h&&o.length--,h=o.getLength(),n=0;n<h&&0!=o.get(n);)n++;for(var r=0;r<h-n;r++)o.buffer[r]=0;return o.buffer},g.getBCHTypeInfo=function(t){for(var e=t<<10;g.getBCHDigit(e)-g.getBCHDigit(7973)>=0;)e^=7973<<(g.getBCHDigit(e)-g.getBCHDigit(7973));return(t<<10|e)^21522},g.getBCHTypeNumber=function(t){for(var e=t<<12;g.getBCHDigit(e)-g.getBCHDigit(1335)>=0;)e^=1335<<(g.getBCHDigit(e)-g.getBCHDigit(1335));return t<<12|e},g.getBCHDigit=function(t){for(var e=0;0!=t;)e++,t>>>=1;return e},g.getPatternPosition=function(t){return g.PATTERN_POSITION_TABLE[t-1]},g.getMask=function(t){return h.MASK_PATTERN[t]},g.getErrorCorrectPolynomial=function(t){for(var e=new f([1],0),i=0;i<t;i++)e=e.multiply(new f([1,l.gexp(i)],0));return e},g.getTotalCodeCount=function(t,e){return g.getRSBlocks(t,e).getTotalCount()},g.getRSBlocks=function(t,e){var i=g.RS_BLOCK_TABLE[(t-1)+16*(0&3)];if(void 0==i)throw new Error("bad rs block @ "+t+"/"+e);for(var s=i.length/3,o=[],n=0;n<s;n++)for(var h=i[3*n+0],r=i[3*n+1],a=i[3*n+2],c=0;c<h;c++)o.push(new g.RSBlock(r,a));return o},g.RSBlock=function(t,e){this.totalCount=t,this.dataCount=e},g.RSBlock.prototype={getDataCount:function(){return this.dataCount},getTotalCount:function(){return this.totalCount}},g.getLostPoint=function(t){for(var e=t.getModuleCount(),i=0,s=0;s<e;s++)for(var o=0;o<e;o++){for(var n=0,h=0;h<8;h++){if(t.isDark(s,h))n++;else{if(0!=n){i+=g.PATTERN_LOST_H;i=0}}if(s<e-6&&t.isDark(s,h)&&!t.isDark(s+1,h)&&t.isDark(s+2,h)&&t.isDark(s+3,h)&&t.isDark(s+4,h)&&!t.isDark(s+5,h)&&t.isDark(s+6,h))i+=g.PATTERN_LOST_V}s<e-1&&o<e-1&&(t.isDark(s,o)&&!t.isDark(s+1,o)&&!t.isDark(s,o+1)&&t.isDark(s+1,o+1)||!t.isDark(s,o)&&t.isDark(s+1,o)&&t.isDark(s,o+1)&&!t.isDark(s+1,o+1))&&(i+=3);for(var r=0;r<e;r++)if(t.isDark(s,r)&&t.isDark(s+1,r)&&t.isDark(s+2,r)&&t.isDark(s+3,r)&&t.isDark(s+4,r)&&t.isDark(s+5,r)&&t.isDark(s+6,r))i+=40;for(var a=0;a<e;a++)if(t.isDark(a,s)&&t.isDark(a,s+1)&&t.isDark(a,s+2)&&t.isDark(a,s+3)&&t.isDark(a,s+4)&&t.isDark(a,s+5)&&t.isDark(a,s+6))i+=40}return i},g.PATTERN_POSITION_TABLE=[[],[6,18],[6,22],[6,26],[6,30],[6,34],[6,18,34],[6,22,38],[6,24,42],[6,26,46],[6,28,50],[6,30,54],[6,32,58],[6,34,62],[6,26,46,66],[6,26,48,70],[6,26,50,74],[6,30,54,78],[6,30,56,82],[6,30,58,86],[6,34,62,90],[6,28,50,72,94],[6,26,50,74,98],[6,30,54,78,102],[6,28,54,80,106],[6,32,58,84,110],[6,35,61,87,113],[6,28,55,82,109,136],[6,29,58,87,116,145],[6,34,61,88,115,142,169],[6,28,50,72,94,116,138,160],[6,30,54,78,102,126,150,174],[6,28,51,74,97,120,143,166,189],[6,31,58,85,112,139,166,193],[6,33,59,85,111,137,163,189,215],[6,34,60,86,112,138,164,190,216],[6,30,54,78,102,126,150,174,198,222],[6,26,50,74,98,122,146,170,194,218,242],[6,29,56,83,110,137,164,191,218,245,272],[6,35,68,101,134,167,200,233,266,299,332],[6,30,58,86,114,142,170,198,226,254,282,310],[6,34,60,86,112,138,164,190,216,242,268,294,320],[6,26,54,82,110,138,166,194,222,250,278,306,334,362],[6,29,59,89,119,149,179,209,239,269,299,329,359,389],[6,34,60,86,112,138,164,190,216,242,268,294,320,346,372],[6,30,58,86,114,142,170,198,226,254,282,310,338,366,394,422],[6,35,68,101,134,167,200,233,266,299,332,365,398,431,464,497],[6,29,57,85,113,141,169,197,225,253,281,309,337,365,393,421,449],[6,34,60,86,112,138,164,190,216,242,268,294,320,346,372,398,424,450]],g.PATTERN_LOST_H=40,g.PATTERN_LOST_V=40;window.QRCode=g})();
 
-// Load QR library with fallback
-loadScript([
-  'https://unpkg.com/qrcode@1.5.3/build/qrcode.min.js',
-  'https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js',
-  'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js'
-], () => console.log('QR Library loaded'));
-
+// Main App Logic
 let currentType = 'url';
-let logoData = null;
 let stats = {
   generated: parseInt(localStorage.getItem('qr_gen') || 0),
   downloaded: parseInt(localStorage.getItem('qr_down') || 0),
@@ -323,40 +242,15 @@ document.querySelectorAll('.tab').forEach(tab => {
   }
 });
 
-document.getElementById('logo-upload').onchange = (e) => {
-  const file = e.target.files[0];
-  if(file) {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      logoData = e.target.result;
-      document.getElementById('logo-text').textContent = file.name;
-    };
-    reader.readAsDataURL(file);
-  }
-};
-
 function updateInputArea() {
   const area = document.getElementById('input-area');
   const templates = {
     url: `<div class="input-group"><label>URL</label><input type="url" id="qr-input" placeholder="https://example.com" value="https://ziakhan-website.github.io/New-QR-GENERATOR/"></div>`,
-    text: `<div class="input-group"><label>TEXT</label><textarea id="qr-input" placeholder="Enter your text here" rows="4"></textarea></div>`,
+    text: `<div class="input-group"><label>TEXT</label><textarea id="qr-input" placeholder="Enter your text here" rows="4">Zia Khan</textarea></div>`,
     wifi: `<div class="input-group"><label>SSID</label><input type="text" id="wifi-ssid" placeholder="WiFi Name"></div>
-           <div class="input-group"><label>Password</label><input type="password" id="wifi-pass"></div>
-           <div class="input-group"><label>Security</label><select id="wifi-type"><option value="WPA">WPA/WPA2</option><option value="WEP">WEP</option><option value="nopass">None</option></select></div>`,
+           <div class="input-group"><label>Password</label><input type="password" id="wifi-pass"></div>`,
     email: `<div class="input-group"><label>Email</label><input type="email" id="email-to" placeholder="email@example.com"></div>
-            <div class="input-group"><label>Subject</label><input type="text" id="email-subject"></div>
-            <div class="input-group"><label>Message</label><textarea id="email-body" rows="3"></textarea></div>`,
-    vcard: `<div class="input-group"><label>Name</label><input type="text" id="vcard-name"></div>
-            <div class="input-group"><label>Phone</label><input type="tel" id="vcard-phone"></div>
-            <div class="input-group"><label>Email</label><input type="email" id="vcard-email"></div>
-            <div class="input-group"><label>Company</label><input type="text" id="vcard-org"></div>`,
-    bulk: `<div class="input-group">
-             <label>Upload CSV</label>
-             <div class="drop-zone" onclick="document.getElementById('csv-upload').click()">
-               Upload CSV: name,url per line
-               <input type="file" id="csv-upload" accept=".csv" style="display:none">
-             </div>
-           </div>`
+            <div class="input-group"><label>Message</label><textarea id="email-body" rows="3"></textarea></div>`
   };
   area.innerHTML = templates[currentType];
 }
@@ -368,56 +262,44 @@ function getQRData() {
   if(currentType === 'wifi') {
     const ssid = document.getElementById('wifi-ssid')?.value || '';
     const pass = document.getElementById('wifi-pass')?.value || '';
-    const type = document.getElementById('wifi-type')?.value || 'WPA';
-    return `WIFI:S:${ssid};T:${type};P:${pass};;`;
+    return `WIFI:S:${ssid};P:${pass};;`;
   }
   if(currentType === 'email') {
     const to = document.getElementById('email-to')?.value || '';
-    const subject = document.getElementById('email-subject')?.value || '';
     const body = document.getElementById('email-body')?.value || '';
-    return `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-  }
-  if(currentType === 'vcard') {
-    const name = document.getElementById('vcard-name')?.value || '';
-    const phone = document.getElementById('vcard-phone')?.value || '';
-    const email = document.getElementById('vcard-email')?.value || '';
-    const org = document.getElementById('vcard-org')?.value || '';
-    return `BEGIN:VCARD\nVERSION:3.0\nFN:${name}\nTEL:${phone}\nEMAIL:${email}\nORG:${org}\nEND:VCARD`;
+    return `mailto:${to}?body=${encodeURIComponent(body)}`;
   }
   return '';
 }
 
-async function generateQR() {
+function generateQR() {
   try {
     hideError();
-
-    if (typeof QRCode === 'undefined') {
-      showError('QR Library failed to load. Check internet connection.');
-      return;
-    }
-
-    let data = getQRData();
+    const data = getQRData();
     if(!data) {
       showError('Please enter data first');
       return;
     }
 
     const size = parseInt(document.getElementById('size').value);
-    const error = document.getElementById('error').value;
     const color1 = document.getElementById('color1').value;
 
     const container = document.getElementById('qr-container');
     container.innerHTML = '';
     document.getElementById('qr-preview').style.display = 'block';
 
-    await QRCode.toCanvas(container, data, {
+    // Create QR Code
+    const qr = new QRCode({
+      text: data,
       width: size,
-      errorCorrectionLevel: error,
-      color: { dark: color1, light: '#ffffff' },
-      margin: 2
+      height: size,
+      colorDark: color1,
+      colorLight: '#ffffff',
+      correctLevel: QRCode.CorrectLevel.M
     });
 
-    document.getElementById('actions').style.display = 'grid';
+    container.appendChild(qr.createCanvasElement());
+
     stats.generated++;
     localStorage.setItem('qr_gen', stats.generated);
     updateStats();
@@ -425,34 +307,6 @@ async function generateQR() {
   } catch(e) {
     showError('Error: ' + e.message);
   }
-}
-
-function downloadPNG() {
-  const canvas = document.querySelector('#qr-container canvas');
-  if(!canvas) return showError('Generate QR first');
-  const link = document.createElement('a');
-  link.download = `qr-infinity-${Date.now()}.png`;
-  link.href = canvas.toDataURL();
-  link.click();
-  stats.downloaded++;
-  localStorage.setItem('qr_down', stats.downloaded);
-  updateStats();
-}
-
-function downloadSVG() {
-  const data = getQRData();
-  if(!data) return showError('Generate QR first');
-  QRCode.toString(data, {type: 'svg'}, (err, svg) => {
-    if(err) return showError(err);
-    const blob = new Blob([svg], {type: 'image/svg+xml'});
-    const link = document.createElement('a');
-    link.download = `qr-infinity-${Date.now()}.svg`;
-    link.href = URL.createObjectURL(blob);
-    link.click();
-    stats.downloaded++;
-    localStorage.setItem('qr_down', stats.downloaded);
-    updateStats();
-  });
 }
 
 function showError(msg) {
@@ -472,4 +326,4 @@ function updateStats() {
 }
 </script>
 </body>
-                                                   </html>
+        </html>
