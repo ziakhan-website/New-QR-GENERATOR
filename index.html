@@ -37,7 +37,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-width: 0; /* Important for flex shrink */
+  min-width: 0;
 }
 
 h1 {
@@ -108,6 +108,20 @@ input, select, textarea {
   color: white;
 }
 
+.btn-secondary {
+  background: rgba(255,255,255,0.1);
+  margin-top: 10px;
+}
+
+.logo-upload {
+  border: 2px dashed rgba(255,255,255,0.2);
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  cursor: pointer;
+  font-size: 14px;
+}
+
 .qr-preview {
   background: white;
   padding: 15px;
@@ -123,6 +137,13 @@ input, select, textarea {
   display: block;
 }
 
+.alert {
+  display: none;
+  color: #fca5a5;
+  margin-top: 10px;
+  font-size: 14px;
+}
+
 /* Mobile Responsive */
 @media (max-width: 900px) {
 .container {
@@ -135,8 +156,8 @@ input, select, textarea {
     padding: 20px;
   }
 
- .qr-preview {
-    max-width: 320px; /* Limit QR size on mobile */
+.qr-preview {
+    max-width: 320px;
     margin: 0 auto;
   }
 }
@@ -158,12 +179,11 @@ input, select, textarea {
     <div id="input-area"></div>
 
     <div class="input-group">
-      <label>SIZE</label>
+      <label>DISPLAY SIZE</label>
       <select id="size">
         <option value="256">256px - Mobile</option>
-        <option value="512">512px - Tablet</option>
+        <option value="512" selected>512px - Tablet</option>
         <option value="1024">1024px - Desktop</option>
-        <option value="2048">2048px - Print</option>
       </select>
     </div>
 
@@ -171,15 +191,15 @@ input, select, textarea {
       <label>ERROR CORRECTION</label>
       <select id="ec">
         <option value="L">Low ~7%</option>
-        <option value="M" selected>Medium ~15%</option>
+        <option value="M">Medium ~15%</option>
         <option value="Q">Quartile ~25%</option>
-        <option value="H">High ~30%</option>
+        <option value="H" selected>High ~30%</option>
       </select>
     </div>
 
     <div class="grid-2">
       <div class="input-group">
-        <label>COLOR 1</label>
+        <label>COLOR</label>
         <input type="color" id="color1" value="#000">
       </div>
       <div class="input-group">
@@ -193,15 +213,15 @@ input, select, textarea {
 
     <div class="input-group">
       <label>LOGO UPLOAD</label>
-      <div style="border: 2px dashed rgba(255,255,255,0.2); border-radius: 12px; padding: 20px; text-align: center; cursor: pointer;" onclick="document.getElementById('logo').click()">
+      <div class="logo-upload" onclick="document.getElementById('logo').click()">
         <input type="file" id="logo" accept="image/*" style="display:none">
         <div id="logo-text">Tap to upload logo</div>
       </div>
     </div>
 
     <button class="btn" onclick="generateQR()">Generate QR Code</button>
-    <button class="btn" style="background: rgba(255,255,255,0.1);" onclick="downloadPNG()">Download PNG</button>
-    <div class="alert" id="error-alert" style="display:none; color:#fca5a5; margin-top:10px;"></div>
+    <button class="btn btn-secondary" onclick="downloadPNG()">Download PNG</button>
+    <div class="alert" id="error-alert"></div>
   </div>
 
   <div class="preview-area">
@@ -220,7 +240,7 @@ input, select, textarea {
 let currentType = 'url';
 let logoFile = null;
 
-// Auto set mobile size on load
+// Auto set mobile size
 if(window.innerWidth < 900) {
   document.getElementById('size').value = '256';
 }
@@ -269,7 +289,7 @@ function getQRData() {
   if(currentType === 'vcard') {
     const name = document.getElementById('name').value;
     const phone = document.getElementById('phone').value;
-    return `BEGIN:VCARD\\nFN:${name}\\nTEL:${phone}\\nEND:VCARD`;
+    return `BEGIN:VCARD\nFN:${name}\nTEL:${phone}\nEND:VCARD`;
   }
   return '';
 }
@@ -281,7 +301,7 @@ function generateQR() {
     return;
   }
 
-  document.getElementById('error-alert').style.display = 'none';
+  hideError();
   document.getElementById('placeholder').style.display = 'none';
 
   const size = parseInt(document.getElementById('size').value);
@@ -308,7 +328,7 @@ function generateQR() {
     finalCanvas.width = size + frameSize;
     finalCanvas.height = size + frameSize;
 
-    ctx.fillStyle = '#fff';
+    ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
 
     if(frame === 'square') {
@@ -323,8 +343,14 @@ function generateQR() {
     if(logoFile) {
       const logo = new Image();
       logo.onload = () => {
-        const logoSize = size * 0.15;
-        ctx.drawImage(logo, finalCanvas.width/2 - logoSize/2, finalCanvas.height/2 - logoSize/2, logoSize, logoSize);
+        const logoSize = size * 0.10; // 10% max for scannability
+        const x = finalCanvas.width/2 - logoSize/2;
+        const y = finalCanvas.height/2 - logoSize/2;
+
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(x-4, y-4, logoSize+8, logoSize+8);
+        ctx.drawImage(logo, x, y, logoSize, logoSize);
+
         document.getElementById('qr-preview').style.display = 'block';
       };
       logo.src = URL.createObjectURL(logoFile);
@@ -341,9 +367,22 @@ function downloadPNG() {
     showError('Generate QR first');
     return;
   }
+
+  // Download at 512px for small file size and better scanning
+  const downloadSize = 512;
+  const tempCanvas = document.createElement('canvas');
+  const ctx = tempCanvas.getContext('2d');
+
+  tempCanvas.width = downloadSize;
+  tempCanvas.height = downloadSize;
+
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, downloadSize, downloadSize);
+  ctx.drawImage(canvas, 0, 0, canvas.width, canvas.height, 0, 0, downloadSize, downloadSize);
+
   const link = document.createElement('a');
   link.download = `qr-${Date.now()}.png`;
-  link.href = canvas.toDataURL();
+  link.href = tempCanvas.toDataURL('image/png', 0.95);
   link.click();
 }
 
@@ -352,6 +391,10 @@ function showError(msg) {
   alert.textContent = msg;
   alert.style.display = 'block';
 }
+
+function hideError() {
+  document.getElementById('error-alert').style.display = 'none';
+}
 </script>
 </body>
-  </html>
+          </html>
