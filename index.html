@@ -51,7 +51,7 @@ body {
 }
 
 @media(max-width: 968px) {
- .container { grid-template-columns: 1fr; }
+.container { grid-template-columns: 1fr; }
 }
 
 .glass {
@@ -461,7 +461,6 @@ async function generateQR() {
 
   const container = document.getElementById('qr-container');
   container.innerHTML = '';
-
   document.getElementById('qr-wrapper').style.display = 'block';
 
   if(frame!== 'none') {
@@ -472,7 +471,7 @@ async function generateQR() {
     }
   }
 
-  await QRCode.toCanvas(container, data, {
+  const canvas = await QRCode.toCanvas(container, data, {
     width: size,
     errorCorrectionLevel: error,
     color: { dark: color1, light: '#ffffff' },
@@ -495,10 +494,24 @@ async function generateQR() {
 
 function applyGradient(canvas, color1, color2) {
   const ctx = canvas.getContext('2d');
+  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const data = imageData.data;
+
+  ctx.fillStyle = color1;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
   const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
   gradient.addColorStop(0, color1);
   gradient.addColorStop(1, color2);
-  // Note: qrcode lib doesn't support gradient directly, this is for future canvas manipulation
+
+  for(let i = 0; i < data.length; i += 4) {
+    if(data[i] === 0 && data[i+1] === 0 && data[i+2] === 0 && data[i+3] === 255) {
+      ctx.fillStyle = gradient;
+      const x = (i/4) % canvas.width;
+      const y = Math.floor((i/4) / canvas.width);
+      ctx.fillRect(x, y, 1, 1);
+    }
+  }
 }
 
 function downloadPNG() {
@@ -578,7 +591,6 @@ function updateSavedStat() {
   updateStats();
 }
 
-// Simulate scan tracking
 setInterval(() => {
   if(Math.random() > 0.7) {
     scans++;
