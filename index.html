@@ -7,324 +7,191 @@
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
 
-:root {
-  --bg-dark: #0f0f1a;
-  --glass: rgba(255, 255, 255, 0.04);
-  --glass-hover: rgba(255, 255, 255, 0.08);
-  --border: rgba(255, 255, 255, 0.1);
-  --text: #fff;
-  --text-dim: #a1a1aa;
-  --accent1: #6366f1;
-  --accent2: #d946ef;
-}
-
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Space Grotesk', sans-serif; }
 
 body {
-  background: var(--bg-dark);
-  color: var(--text);
+  background: linear-gradient(135deg, #0f0f1a 0%, #1e1b4b 100%);
+  color: #fff;
   min-height: 100vh;
-  overflow-x: hidden;
-}
-
-#bg-animated {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  z-index: -2;
-  background: linear-gradient(135deg, #0f0f1a 0%, #1e1b4b 50%, #0f0f1a 100%);
-  animation: gradientShift 15s ease infinite;
-  background-size: 200% 200%;
-}
-
-@keyframes gradientShift {
- 0%, 100% { background-position: 0% 50%; }
- 50% { background-position: 100% 50%; }
-}
-
-#glow {
-  position: fixed;
-  width: 600px; height: 600px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(99, 102, 241, 0.3) 0%, transparent 70%);
-  filter: blur(80px);
-  z-index: -1;
-  animation: float 20s ease-in-out infinite;
-}
-
-@keyframes float {
- 0%, 100% { transform: translate(0, 0) scale(1); }
- 33% { transform: translate(100px, -100px) scale(1.1); }
- 66% { transform: translate(-100px, 100px) scale(0.9); }
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
 }
 
 .container {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 40px 20px;
-  display: grid;
-  grid-template-columns: 1.2fr 0.8fr;
-  gap: 40px;
-}
-
-@media(max-width: 1024px) {
- .container { grid-template-columns: 1fr; }
+  width: 100%;
+  max-width: 700px;
 }
 
 .glass-card {
-  background: var(--glass);
-  backdrop-filter: blur(40px) saturate(180%);
-  border-radius: 40px;
-  padding: 45px;
-  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(40px);
+  border-radius: 32px;
+  padding: 40px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: 0 20px 80px rgba(0,0,0,0.5);
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-}
-.glass-card:hover {
-  background: var(--glass-hover);
-  transform: translateY(-5px);
-  box-shadow: 0 30px 100px rgba(99, 102, 241, 0.3);
 }
 
-.logo-header {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  margin-bottom: 10px;
-}
-.logo-header h1 {
-  font-size: 42px;
+h1 {
+  font-size: 36px;
   font-weight: 700;
-  background: linear-gradient(135deg, #fff 0%, #c4b5fd 100%);
+  background: linear-gradient(135deg, #fff, #c4b5fd);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
 }
+
 .pro-badge {
-  padding: 8px 16px;
-  background: linear-gradient(135deg, var(--accent1), var(--accent2));
-  border-radius: 30px;
-  font-size: 13px;
+  padding: 6px 14px;
+  background: linear-gradient(135deg, #6366f1, #d946ef);
+  border-radius: 20px;
+  font-size: 12px;
   font-weight: 600;
-  letter-spacing: 1px;
 }
 
 .subtitle {
-  color: var(--text-dim);
-  font-size: 16px;
-  margin-bottom: 35px;
+  color: #a1a1aa;
+  font-size: 15px;
+  margin-bottom: 30px;
 }
 
 .tabs {
   display: flex;
-  gap: 12px;
-  margin-bottom: 35px;
+  gap: 10px;
+  margin-bottom: 30px;
   overflow-x: auto;
   scrollbar-width: none;
 }
 .tabs::-webkit-scrollbar { display: none; }
 
 .tab {
-  padding: 14px 26px;
-  border-radius: 18px;
-  background: rgba(255,255,255,0.03);
-  border: 1px solid var(--border);
-  color: var(--text-dim);
+  padding: 12px 24px;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: #a1a1aa;
   cursor: pointer;
   white-space: nowrap;
   transition: all 0.3s;
   font-weight: 500;
 }
-.tab:hover {
-  background: rgba(255,255,255,0.08);
-  transform: translateY(-2px);
-}
 .tab.active {
-  background: linear-gradient(135deg, var(--accent1), var(--accent2));
+  background: linear-gradient(135deg, #6366f1, #d946ef);
   color: white;
   border-color: transparent;
-  box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
 }
 
-.input-group { margin-bottom: 22px; }
-.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
-.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; }
+.input-group { margin-bottom: 20px; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 
 label {
   display: block;
   font-size: 11px;
-  color: var(--text-dim);
-  margin-bottom: 10px;
+  color: #a1a1aa;
+  margin-bottom: 8px;
   text-transform: uppercase;
-  letter-spacing: 2px;
+  letter-spacing: 1.5px;
   font-weight: 600;
 }
 
 input, select, textarea {
   width: 100%;
-  padding: 16px 18px;
-  border-radius: 18px;
-  border: 1px solid var(--border);
-  background: rgba(255,255,255,0.03);
+  padding: 16px;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.05);
   color: #fff;
   font-size: 15px;
   outline: none;
-  transition: all 0.3s;
 }
 input:focus, select:focus, textarea:focus {
-  border-color: var(--accent1);
-  background: rgba(99, 102, 241, 0.1);
-  box-shadow: 0 0 40px rgba(99, 102, 241, 0.3);
-}
-
-input[type="color"] {
-  height: 55px;
-  padding: 8px;
-  cursor: pointer;
+  border-color: #6366f1;
+  box-shadow: 0 0 30px rgba(99, 102, 241, 0.3);
 }
 
 .drop-zone {
   border: 2px dashed rgba(99, 102, 241, 0.4);
-  border-radius: 20px;
-  padding: 35px;
+  border-radius: 16px;
+  padding: 30px;
   text-align: center;
   cursor: pointer;
-  transition: all 0.4s;
-}
-.drop-zone:hover {
-  border-color: var(--accent1);
-  background: rgba(99, 102, 241, 0.1);
-  transform: scale(1.02);
 }
 
 .btn {
-  padding: 18px 30px;
-  border-radius: 20px;
+  padding: 18px;
+  border-radius: 18px;
   border: none;
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-}
-.btn-primary {
-  background: linear-gradient(135deg, var(--accent1), var(--accent2));
-  color: white;
   width: 100%;
   margin-top: 15px;
-  box-shadow: 0 15px 40px rgba(99, 102, 241, 0.4);
-}
-.btn-primary:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 20px 60px rgba(99, 102, 241, 0.6);
-}
-.btn-primary:active { transform: translateY(0); }
-
-.btn-secondary {
-  background: rgba(255,255,255,0.05);
+  background: linear-gradient(135deg, #6366f1, #d946ef);
   color: white;
-  border: 1px solid var(--border);
+  transition: all 0.3s;
 }
-.btn-secondary:hover {
-  background: rgba(255,255,255,0.1);
-  transform: translateY(-2px);
-}
-
-.preview-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 30px;
-}
+.btn:hover { transform: translateY(-2px); box-shadow: 0 15px 40px rgba(99, 102, 241, 0.4); }
 
 .qr-preview {
   background: white;
-  padding: 40px;
-  border-radius: 40px;
+  padding: 30px;
+  border-radius: 24px;
   display: none;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-  animation: scaleIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-@keyframes scaleIn {
-  from { opacity: 0; transform: scale(0.8); }
-  to { opacity: 1; transform: scale(1); }
+  margin-top: 30px;
 }
 
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
-  width: 100%;
+  gap: 16px;
   margin-top: 20px;
 }
 .stat-box {
-  background: rgba(255,255,255,0.03);
-  padding: 25px;
-  border-radius: 24px;
+  background: rgba(255,255,255,0.05);
+  padding: 20px;
+  border-radius: 20px;
   text-align: center;
-  border: 1px solid var(--border);
 }
 .stat-num {
-  font-size: 36px;
+  font-size: 32px;
   font-weight: 700;
-  background: linear-gradient(135deg, var(--accent1), var(--accent2));
+  background: linear-gradient(135deg, #6366f1, #d946ef);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 .stat-label {
-  font-size: 12px;
-  color: var(--text-dim);
-  margin-top: 8px;
+  font-size: 11px;
+  color: #a1a1aa;
+  margin-top: 6px;
   text-transform: uppercase;
-  letter-spacing: 1px;
 }
 
 .alert {
-  padding: 16px 20px;
-  border-radius: 16px;
-  margin-top: 20px;
+  padding: 14px 18px;
+  border-radius: 14px;
+  margin-top: 15px;
   display: none;
-  animation: slideDown 0.3s;
-}
-.alert.error {
   background: rgba(239, 68, 68, 0.1);
   border: 1px solid rgba(239, 68, 68, 0.3);
   color: #fca5a5;
 }
-.alert.success {
-  background: rgba(34, 197, 94, 0.1);
-  border: 1px solid rgba(34, 197, 94, 0.3);
-  color: #86efac;
-}
-@keyframes slideDown {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
 
-.loading {
+.actions {
   display: none;
-  width: 20px;
-  height: 20px;
-  border: 2px solid rgba(255,255,255,0.3);
-  border-top-color: white;
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-}
-@keyframes spin {
-  to { transform: rotate(360deg); }
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 20px;
 }
 </style>
 </head>
 <body>
-<div id="bg-animated"></div>
-<div id="glow"></div>
-
 <div class="container">
   <div class="glass-card">
-    <div class="logo-header">
-      <h1>QR Infinity Pro</h1>
-      <span class="pro-badge">PRO</span>
-    </div>
+    <h1>QR Infinity Pro <span class="pro-badge">PRO</span></h1>
     <p class="subtitle">Generate stunning QR codes with advanced customization & analytics</p>
 
     <div class="tabs">
@@ -345,7 +212,6 @@ input[type="color"] {
           <option value="512">512px</option>
           <option value="1024" selected>1024px</option>
           <option value="2048">2048px</option>
-          <option value="4096">4096px</option>
         </select>
       </div>
       <div class="input-group">
@@ -378,27 +244,20 @@ input[type="color"] {
       </div>
     </div>
 
-    <button class="btn btn-primary" onclick="generateQR()">
-      <span id="btn-text">Generate QR Code</span>
-      <div class="loading" id="loading"></div>
-    </button>
+    <button class="btn" onclick="generateQR()">Generate QR Code</button>
+    <div class="alert" id="error-alert"></div>
 
-    <div class="alert error" id="error-alert"></div>
-    <div class="alert success" id="success-alert"></div>
-  </div>
-
-  <div class="glass-card preview-wrapper">
     <div class="qr-preview" id="qr-preview">
       <div id="qr-container"></div>
     </div>
 
-    <div class="grid-2" id="actions" style="display:none; width:100%;">
-      <button class="btn btn-secondary" onclick="downloadPNG()">Download PNG</button>
-      <button class="btn btn-secondary" onclick="downloadSVG()">Download SVG</button>
-      <button class="btn btn-secondary" onclick="copyQR()">Copy</button>
-      <button class="btn btn-secondary" onclick="shareQR()">Share</button>
+    <div class="actions" id="actions">
+      <button class="btn" onclick="downloadPNG()">Download PNG</button>
+      <button class="btn" onclick="downloadSVG()">Download SVG</button>
     </div>
+  </div>
 
+  <div class="glass-card" style="margin-top: 20px;">
     <div class="stats-grid">
       <div class="stat-box">
         <div class="stat-num" id="stat-generated">0</div>
@@ -416,8 +275,34 @@ input[type="color"] {
   </div>
 </div>
 
-<script src="https://unpkg.com/qrcode@1.5.3/build/qrcode.min.js"></script>
 <script>
+// Multi CDN fallback system
+function loadScript(urls, callback) {
+  let index = 0;
+  function tryLoad() {
+    if(index >= urls.length) {
+      showError('QR Library failed to load. Check internet connection.');
+      return;
+    }
+    const script = document.createElement('script');
+    script.src = urls[index];
+    script.onload = callback;
+    script.onerror = () => {
+      index++;
+      tryLoad();
+    };
+    document.head.appendChild(script);
+  }
+  tryLoad();
+}
+
+// Load QR library with fallback
+loadScript([
+  'https://unpkg.com/qrcode@1.5.3/build/qrcode.min.js',
+  'https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js',
+  'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js'
+], () => console.log('QR Library loaded'));
+
 let currentType = 'url';
 let logoData = null;
 let stats = {
@@ -445,7 +330,6 @@ document.getElementById('logo-upload').onchange = (e) => {
     reader.onload = (e) => {
       logoData = e.target.result;
       document.getElementById('logo-text').textContent = file.name;
-      showAlert('Logo uploaded successfully!', 'success');
     };
     reader.readAsDataURL(file);
   }
@@ -455,25 +339,21 @@ function updateInputArea() {
   const area = document.getElementById('input-area');
   const templates = {
     url: `<div class="input-group"><label>URL</label><input type="url" id="qr-input" placeholder="https://example.com" value="https://ziakhan-website.github.io/New-QR-GENERATOR/"></div>`,
-    text: `<div class="input-group"><label>Text</label><textarea id="qr-input" placeholder="Enter your text here" rows="4"></textarea></div>`,
-    wifi: `<div class="input-group"><label>Network Name (SSID)</label><input type="text" id="wifi-ssid" placeholder="MyWiFi"></div>
-           <div class="input-group"><label>Password</label><input type="password" id="wifi-pass" placeholder="Password"></div>
-           <div class="input-group"><label>Security Type</label><select id="wifi-type"><option value="WPA">WPA/WPA2</option><option value="WEP">WEP</option><option value="nopass">No Password</option></select></div>`,
-    email: `<div class="input-group"><label>To Email</label><input type="email" id="email-to" placeholder="recipient@email.com"></div>
-            <div class="input-group"><label>Subject</label><input type="text" id="email-subject" placeholder="Subject line"></div>
+    text: `<div class="input-group"><label>TEXT</label><textarea id="qr-input" placeholder="Enter your text here" rows="4"></textarea></div>`,
+    wifi: `<div class="input-group"><label>SSID</label><input type="text" id="wifi-ssid" placeholder="WiFi Name"></div>
+           <div class="input-group"><label>Password</label><input type="password" id="wifi-pass"></div>
+           <div class="input-group"><label>Security</label><select id="wifi-type"><option value="WPA">WPA/WPA2</option><option value="WEP">WEP</option><option value="nopass">None</option></select></div>`,
+    email: `<div class="input-group"><label>Email</label><input type="email" id="email-to" placeholder="email@example.com"></div>
+            <div class="input-group"><label>Subject</label><input type="text" id="email-subject"></div>
             <div class="input-group"><label>Message</label><textarea id="email-body" rows="3"></textarea></div>`,
-    vcard: `<div class="grid-2">
-              <div class="input-group"><label>Full Name</label><input type="text" id="vcard-name" placeholder="John Doe"></div>
-              <div class="input-group"><label>Phone</label><input type="tel" id="vcard-phone" placeholder="+1234567890"></div>
-            </div>
-            <div class="grid-2">
-              <div class="input-group"><label>Email</label><input type="email" id="email" placeholder="john@email.com"></div>
-              <div class="input-group"><label>Company</label><input type="text" id="vcard-org" placeholder="Company Inc"></div>
-            </div>`,
+    vcard: `<div class="input-group"><label>Name</label><input type="text" id="vcard-name"></div>
+            <div class="input-group"><label>Phone</label><input type="tel" id="vcard-phone"></div>
+            <div class="input-group"><label>Email</label><input type="email" id="vcard-email"></div>
+            <div class="input-group"><label>Company</label><input type="text" id="vcard-org"></div>`,
     bulk: `<div class="input-group">
-             <label>Upload CSV File</label>
+             <label>Upload CSV</label>
              <div class="drop-zone" onclick="document.getElementById('csv-upload').click()">
-               Upload CSV with format: name,url
+               Upload CSV: name,url per line
                <input type="file" id="csv-upload" accept=".csv" style="display:none">
              </div>
            </div>`
@@ -500,7 +380,7 @@ function getQRData() {
   if(currentType === 'vcard') {
     const name = document.getElementById('vcard-name')?.value || '';
     const phone = document.getElementById('vcard-phone')?.value || '';
-    const email = document.getElementById('email')?.value || '';
+    const email = document.getElementById('vcard-email')?.value || '';
     const org = document.getElementById('vcard-org')?.value || '';
     return `BEGIN:VCARD\nVERSION:3.0\nFN:${name}\nTEL:${phone}\nEMAIL:${email}\nORG:${org}\nEND:VCARD`;
   }
@@ -509,15 +389,18 @@ function getQRData() {
 
 async function generateQR() {
   try {
-    hideAlerts();
-    toggleLoading(true);
+    hideError();
 
     if (typeof QRCode === 'undefined') {
-      throw new Error('QR Library failed to load. Check internet connection.');
+      showError('QR Library failed to load. Check internet connection.');
+      return;
     }
 
     let data = getQRData();
-    if(!data) throw new Error('Please enter data first');
+    if(!data) {
+      showError('Please enter data first');
+      return;
+    }
 
     const size = parseInt(document.getElementById('size').value);
     const error = document.getElementById('error').value;
@@ -534,57 +417,33 @@ async function generateQR() {
       margin: 2
     });
 
-    // Add logo overlay if exists
-    if(logoData) {
-      addLogoToQR();
-    }
-
     document.getElementById('actions').style.display = 'grid';
     stats.generated++;
     localStorage.setItem('qr_gen', stats.generated);
     updateStats();
-    showAlert('QR Code generated successfully!', 'success');
 
   } catch(e) {
-    showAlert(e.message, 'error');
-  } finally {
-    toggleLoading(false);
+    showError('Error: ' + e.message);
   }
-}
-
-function addLogoToQR() {
-  const canvas = document.querySelector('#qr-container canvas');
-  const ctx = canvas.getContext('2d');
-  const img = new Image();
-  img.onload = () => {
-    const size = canvas.width * 0.2;
-    const x = (canvas.width - size) / 2;
-    const y = (canvas.height - size) / 2;
-    ctx.fillStyle = 'white';
-    ctx.fillRect(x - 10, y - 10, size + 20, size + 20);
-    ctx.drawImage(img, x, y, size, size);
-  };
-  img.src = logoData;
 }
 
 function downloadPNG() {
   const canvas = document.querySelector('#qr-container canvas');
-  if(!canvas) return showAlert('Generate QR first', 'error');
+  if(!canvas) return showError('Generate QR first');
   const link = document.createElement('a');
   link.download = `qr-infinity-${Date.now()}.png`;
-  link.href = canvas.toDataURL('image/png');
+  link.href = canvas.toDataURL();
   link.click();
   stats.downloaded++;
   localStorage.setItem('qr_down', stats.downloaded);
   updateStats();
-  showAlert('PNG downloaded!', 'success');
 }
 
 function downloadSVG() {
   const data = getQRData();
-  if(!data) return showAlert('Generate QR first', 'error');
+  if(!data) return showError('Generate QR first');
   QRCode.toString(data, {type: 'svg'}, (err, svg) => {
-    if(err) return showAlert(err, 'error');
+    if(err) return showError(err);
     const blob = new Blob([svg], {type: 'image/svg+xml'});
     const link = document.createElement('a');
     link.download = `qr-infinity-${Date.now()}.svg`;
@@ -593,52 +452,17 @@ function downloadSVG() {
     stats.downloaded++;
     localStorage.setItem('qr_down', stats.downloaded);
     updateStats();
-    showAlert('SVG downloaded!', 'success');
   });
 }
 
-function copyQR() {
-  const canvas = document.querySelector('#qr-container canvas');
-  if(!canvas) return showAlert('Generate QR first', 'error');
-  canvas.toBlob(blob => {
-    navigator.clipboard.write([new ClipboardItem({'image/png': blob})]);
-    showAlert('Copied to clipboard!', 'success');
-  });
-}
-
-function shareQR() {
-  const canvas = document.querySelector('#qr-container canvas');
-  if(!canvas) return showAlert('Generate QR first', 'error');
-  canvas.toBlob(async blob => {
-    const file = new File([blob], 'qr-code.png', {type: 'image/png'});
-    if(navigator.share) {
-      await navigator.share({files: [file], title: 'QR Code', text: 'Check out this QR code'});
-      stats.shared++;
-      localStorage.setItem('qr_share', stats.shared);
-      updateStats();
-      showAlert('Shared successfully!', 'success');
-    } else {
-      showAlert('Share not supported on this browser', 'error');
-    }
-  });
-}
-
-function showAlert(msg, type) {
-  hideAlerts();
-  const alert = document.getElementById(type === 'error'? 'error-alert' : 'success-alert');
+function showError(msg) {
+  const alert = document.getElementById('error-alert');
   alert.textContent = msg;
   alert.style.display = 'block';
-  setTimeout(() => alert.style.display = 'none', 4000);
 }
 
-function hideAlerts() {
+function hideError() {
   document.getElementById('error-alert').style.display = 'none';
-  document.getElementById('success-alert').style.display = 'none';
-}
-
-function toggleLoading(show) {
-  document.getElementById('loading').style.display = show? 'inline-block' : 'none';
-  document.getElementById('btn-text').style.display = show? 'none' : 'inline';
 }
 
 function updateStats() {
@@ -646,13 +470,6 @@ function updateStats() {
   document.getElementById('stat-downloaded').textContent = stats.downloaded;
   document.getElementById('stat-shared').textContent = stats.shared;
 }
-
-// Mouse follower glow effect
-document.addEventListener('mousemove', (e) => {
-  const glow = document.getElementById('glow');
-  glow.style.left = e.clientX - 300 + 'px';
-  glow.style.top = e.clientY - 300 + 'px';
-});
 </script>
 </body>
-  </html>
+                                                   </html>
