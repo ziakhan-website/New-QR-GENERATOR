@@ -22,7 +22,6 @@ body {
   padding: 20px;
 }
 
-/* Left Panel - Controls */
 .sidebar {
   width: 380px;
   background: rgba(255, 255, 255, 0.05);
@@ -33,12 +32,12 @@ body {
   height: fit-content;
 }
 
-/* Right Panel - Preview */
 .preview-area {
   flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
+  min-width: 0; /* Important for flex shrink */
 }
 
 h1 {
@@ -47,16 +46,7 @@ h1 {
   background: linear-gradient(135deg, #fff, #c4b5fd);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  margin-bottom: 8px;
-}
-
-.pro-badge {
-  padding: 4px 12px;
-  background: linear-gradient(135deg, #6366f1, #d946ef);
-  border-radius: 20px;
-  font-size: 11px;
-  font-weight: 600;
-  margin-left: 8px;
+  margin-bottom: 20px;
 }
 
 .tabs {
@@ -91,7 +81,6 @@ label {
   color: #a1a1aa;
   margin-bottom: 6px;
   text-transform: uppercase;
-  letter-spacing: 1px;
 }
 
 input, select, textarea {
@@ -119,72 +108,44 @@ input, select, textarea {
   color: white;
 }
 
-.btn-secondary {
-  background: rgba(255,255,255,0.1);
-  margin-top: 10px;
-}
-
-.logo-upload {
-  border: 2px dashed rgba(255,255,255,0.2);
-  border-radius: 12px;
-  padding: 30px 20px;
-  text-align: center;
-  cursor: pointer;
-  font-size: 14px;
-}
-
 .qr-preview {
   background: white;
-  padding: 20px;
-  border-radius: 20px;
+  padding: 15px;
+  border-radius: 16px;
   text-align: center;
   max-width: 100%;
+  width: 100%;
 }
 
 .qr-preview canvas {
   max-width: 100%;
   height: auto;
-}
-
-.alert {
-  padding: 12px 16px;
-  border-radius: 12px;
-  margin-top: 12px;
-  display: none;
-  background: rgba(239, 68, 68, 0.1);
-  border: 1px solid rgba(239, 68, 68, 0.3);
-  color: #fca5a5;
-  font-size: 14px;
+  display: block;
 }
 
 /* Mobile Responsive */
 @media (max-width: 900px) {
- .container {
+.container {
     flex-direction: column;
     padding: 15px;
   }
 
- .sidebar {
+.sidebar {
     width: 100%;
     padding: 20px;
   }
 
- .preview-area {
-    padding: 20px 0;
+ .qr-preview {
+    max-width: 320px; /* Limit QR size on mobile */
+    margin: 0 auto;
   }
-
-  h1 { font-size: 24px; }
-
- .grid-2 { grid-template-columns: 1fr; }
 }
 </style>
 </head>
 <body>
 <div class="container">
-  <!-- Left Sidebar -->
   <div class="sidebar">
-    <h1>QR Infinity Pro <span class="pro-badge">PRO</span></h1>
-    <p style="color:#a1a1aa; font-size:13px; margin-bottom:20px;">Create stunning QR codes</p>
+    <h1>QR Infinity Pro</h1>
 
     <div class="tabs">
       <div class="tab active" data-type="url">URL</div>
@@ -192,7 +153,6 @@ input, select, textarea {
       <div class="tab" data-type="wifi">WiFi</div>
       <div class="tab" data-type="email">Email</div>
       <div class="tab" data-type="vcard">vCard</div>
-      <div class="tab" data-type="bulk">Bulk CSV</div>
     </div>
 
     <div id="input-area"></div>
@@ -200,9 +160,10 @@ input, select, textarea {
     <div class="input-group">
       <label>SIZE</label>
       <select id="size">
-        <option value="512">512px</option>
-        <option value="1024" selected>1024px</option>
-        <option value="2048">2048px</option>
+        <option value="256">256px - Mobile</option>
+        <option value="512">512px - Tablet</option>
+        <option value="1024">1024px - Desktop</option>
+        <option value="2048">2048px - Print</option>
       </select>
     </div>
 
@@ -218,53 +179,37 @@ input, select, textarea {
 
     <div class="grid-2">
       <div class="input-group">
-        <label>STYLE</label>
-        <select id="style">
-          <option value="solid">Solid</option>
-          <option value="gradient">Gradient</option>
-        </select>
+        <label>COLOR 1</label>
+        <input type="color" id="color1" value="#000">
       </div>
       <div class="input-group">
         <label>FRAME</label>
         <select id="frame">
           <option value="none">None</option>
           <option value="square">Square</option>
-          <option value="rounded">Rounded</option>
         </select>
-      </div>
-    </div>
-
-    <div class="grid-2">
-      <div class="input-group">
-        <label>COLOR 1</label>
-        <input type="color" id="color1" value="#000">
-      </div>
-      <div class="input-group">
-        <label>COLOR 2</label>
-        <input type="color" id="color2" value="#6366f1">
       </div>
     </div>
 
     <div class="input-group">
       <label>LOGO UPLOAD</label>
-      <div class="logo-upload" onclick="document.getElementById('logo').click()">
+      <div style="border: 2px dashed rgba(255,255,255,0.2); border-radius: 12px; padding: 20px; text-align: center; cursor: pointer;" onclick="document.getElementById('logo').click()">
         <input type="file" id="logo" accept="image/*" style="display:none">
         <div id="logo-text">Tap to upload logo</div>
       </div>
     </div>
 
     <button class="btn" onclick="generateQR()">Generate QR Code</button>
-    <button class="btn btn-secondary" onclick="downloadPNG()">Download PNG</button>
-    <div class="alert" id="error-alert"></div>
+    <button class="btn" style="background: rgba(255,255,255,0.1);" onclick="downloadPNG()">Download PNG</button>
+    <div class="alert" id="error-alert" style="display:none; color:#fca5a5; margin-top:10px;"></div>
   </div>
 
-  <!-- Right Preview Area -->
   <div class="preview-area">
     <div class="qr-preview" id="qr-preview" style="display:none;">
       <canvas id="final-canvas"></canvas>
     </div>
     <div id="placeholder" style="text-align:center; color:#52525b;">
-      <p style="font-size:16px;">Your QR will appear here</p>
+      <p>Your QR will appear here</p>
     </div>
   </div>
 </div>
@@ -274,6 +219,11 @@ input, select, textarea {
 <script>
 let currentType = 'url';
 let logoFile = null;
+
+// Auto set mobile size on load
+if(window.innerWidth < 900) {
+  document.getElementById('size').value = '256';
+}
 
 updateInputArea();
 
@@ -298,11 +248,9 @@ function updateInputArea() {
     text: `<div class="input-group"><textarea id="data" placeholder="Enter text" rows="3"></textarea></div>`,
     wifi: `<div class="input-group"><input type="text" id="ssid" placeholder="WiFi Name"></div>
            <div class="input-group"><input type="password" id="wifipass" placeholder="Password"></div>`,
-    email: `<div class="input-group"><input type="email" id="emailto" placeholder="To Email"></div>
-            <div class="input-group"><input type="text" id="subject" placeholder="Subject"></div>`,
+    email: `<div class="input-group"><input type="email" id="emailto" placeholder="To Email"></div>`,
     vcard: `<div class="input-group"><input type="text" id="name" placeholder="Full Name"></div>
-            <div class="input-group"><input type="tel" id="phone" placeholder="Phone"></div>`,
-    bulk: `<div class="input-group"><textarea id="csv" placeholder="Paste CSV data" rows="4"></textarea></div>`
+            <div class="input-group"><input type="tel" id="phone" placeholder="Phone"></div>`
   };
   area.innerHTML = templates[currentType];
 }
@@ -316,9 +264,7 @@ function getQRData() {
     return `WIFI:S:${ssid};P:${pass};;`;
   }
   if(currentType === 'email') {
-    const to = document.getElementById('emailto').value;
-    const sub = document.getElementById('subject').value;
-    return `mailto:${to}?subject=${encodeURIComponent(sub)}`;
+    return `mailto:${document.getElementById('emailto').value}`;
   }
   if(currentType === 'vcard') {
     const name = document.getElementById('name').value;
@@ -335,7 +281,7 @@ function generateQR() {
     return;
   }
 
-  hideError();
+  document.getElementById('error-alert').style.display = 'none';
   document.getElementById('placeholder').style.display = 'none';
 
   const size = parseInt(document.getElementById('size').value);
@@ -358,7 +304,7 @@ function generateQR() {
     const finalCanvas = document.getElementById('final-canvas');
     const ctx = finalCanvas.getContext('2d');
 
-    const frameSize = frame!== 'none'? 60 : 0;
+    const frameSize = frame!== 'none'? 40 : 0;
     finalCanvas.width = size + frameSize;
     finalCanvas.height = size + frameSize;
 
@@ -367,15 +313,8 @@ function generateQR() {
 
     if(frame === 'square') {
       ctx.strokeStyle = color1;
-      ctx.lineWidth = 6;
-      ctx.strokeRect(15, 15, finalCanvas.width-30, finalCanvas.height-30);
-    }
-    if(frame === 'rounded') {
-      ctx.strokeStyle = color1;
-      ctx.lineWidth = 6;
-      ctx.beginPath();
-      ctx.roundRect(15, 15, finalCanvas.width-30, finalCanvas.height-30, 15);
-      ctx.stroke();
+      ctx.lineWidth = 4;
+      ctx.strokeRect(10, 10, finalCanvas.width-20, finalCanvas.height-20);
     }
 
     const offset = frameSize / 2;
@@ -384,7 +323,7 @@ function generateQR() {
     if(logoFile) {
       const logo = new Image();
       logo.onload = () => {
-        const logoSize = size * 0.18;
+        const logoSize = size * 0.15;
         ctx.drawImage(logo, finalCanvas.width/2 - logoSize/2, finalCanvas.height/2 - logoSize/2, logoSize, logoSize);
         document.getElementById('qr-preview').style.display = 'block';
       };
@@ -413,10 +352,6 @@ function showError(msg) {
   alert.textContent = msg;
   alert.style.display = 'block';
 }
-
-function hideError() {
-  document.getElementById('error-alert').style.display = 'none';
-}
 </script>
 </body>
-      </html>
+  </html>
