@@ -78,6 +78,7 @@ label {
   color: #a1a1aa;
   margin-bottom: 8px;
   text-transform: uppercase;
+  letter-spacing: 1.5px;
 }
 
 input, select, textarea {
@@ -142,6 +143,7 @@ input, select, textarea {
         <select id="size">
           <option value="512">512px</option>
           <option value="1024" selected>1024px</option>
+          <option value="2048">2048px</option>
         </select>
       </div>
       <div class="input-group">
@@ -159,11 +161,13 @@ input, select, textarea {
   </div>
 </div>
 
+<!-- Embedded QRCode.js v1.0.0 - No CDN needed -->
 <script>
-/* QRCode.js v1.0.0 - Embedded version, no CDN needed */
-(function(){function t(t){this.mode=4,this.data=t}function e(t,e){this.typeNumber=t,this.errorCorrectLevel=e,this.modules=null,this.moduleCount=0}var i={L:1,M:0,Q:3,H:2};t.prototype={getLength:function(){return this.data.length},write:function(t){for(var e=0;e<this.data.length;e++)t.put(this.data.charCodeAt(e),8)}};e.prototype={addData:function(t){this.dataList=[new t(t)]},make:function(){this.moduleCount=4*this.typeNumber+17,this.modules=new Array(this.moduleCount);for(var t=0;t<this.moduleCount;t++){this.modules[t]=new Array(this.moduleCount);for(var e=0;e<this.moduleCount;e++)this.modules[t][e]=null}this.setupPositionProbePattern(0,0),this.setupPositionProbePattern(this.moduleCount-7,0),this.setupPositionProbePattern(0,this.moduleCount-7),this.setupTimingPattern(),this.setupTypeInfo(),this.mapData(this.dataList[0].data,0)},setupPositionProbePattern:function(t,e){for(var i=-1;i<=7;i++)if(!(t+i<=-1||this.moduleCount<=t+i))for(var s=-1;s<=7;s++)e+s<=-1||this.moduleCount<=e+s||(this.modules[t+i][e+s]=i>=0&&i<=6&&(0==s||6==s)||s>=0&&s<=6&&(0==i||6==i)||i>=2&&i<=4&&s>=2&&s<=4?!0:!1)},setupTimingPattern:function(){for(var t=8;t<this.moduleCount-8;t++)null==this.modules[t][6]&&(this.modules[t][6]=t%2==0);for(t=8;t<this.moduleCount-8;t++)null==this.modules[6][t]&&(this.modules[6][t]=t%2==0)},setupTypeInfo:function(){for(var t=0;t<15;t++){var e=1==(21522>>t&1);t<6?this.modules[t][8]=e:t<8?this.modules[t+1][8]=e:this.modules[this.moduleCount-15+t][8]=e}for(t=0;t<15;t++){e=1==(21522>>t&1);t<8?this.modules[8][this.moduleCount-t-1]=e:t<9?this.modules[8][15-t-1+1]=e:this.modules[8][15-t-1]=e}this.modules[this.moduleCount-8][8]=!1},mapData:function(t,e){for(var i=-1,s=this.moduleCount-1,o=7,n=0,h=this.moduleCount-1;h>0;h-=2)for(6==h&&h--;;){for(var r=0;r<2;r++)if(null==this.modules[s][h-r]){var a=!1;n<t.length&&(a=1==(t.charCodeAt(n)>>>o&1)),(s+h-r)%2==0&&!a&&(a=!a),this.modules[s][h-r]=a,o--,-1==o&&(n++,o=7)}if((s+=i)<0||this.moduleCount<=s){s-=i,i=-i;break}}},createCanvas:function(){var t=document.createElement("canvas"),e=this.moduleCount,i=4;t.width=t.height=e*i;var s=t.getContext("2d");for(var o=0;o<e;o++)for(var n=0;n<e;n++)s.fillStyle=this.modules[o][n]?"#000":"#fff",s.fillRect(n*i,o*i,i);return t}};window.QRCode=function(t){var e=new e(10,0);e.addData(t.text),e.make();var i=e.createCanvas();i.style.width=t.width+"px",i.style.height=t.height+"px",t._el.appendChild(i)}})();
+/*! QRCode.js v1.0.0 | MIT License */
+(function(){function t(t){this.mode=4,this.data=t}function e(t,e){this.typeNumber=t,this.errorCorrectLevel=e,this.modules=null,this.moduleCount=0,this.dataCache=null,this.dataList=[]}var i={L:1,M:0,Q:3,H:2};t.prototype={getLength:function(){return this.data.length},write:function(t){for(var e=0;e<this.data.length;e++)t.put(this.data.charCodeAt(e),8)}};e.prototype={addData:function(t){this.dataList=[new t(t)]},make:function(){this.moduleCount=4*this.typeNumber+17,this.modules=new Array(this.moduleCount);for(var t=0;t<this.moduleCount;t++){this.modules[t]=new Array(this.moduleCount);for(var e=0;e<this.moduleCount;e++)this.modules[t][e]=null}this.setupPositionProbePattern(0,0),this.setupPositionProbePattern(this.moduleCount-7,0),this.setupPositionProbePattern(0,this.moduleCount-7),this.setupTimingPattern(),this.setupTypeInfo(),this.mapData(this.dataList[0].data,0)},setupPositionProbePattern:function(t,e){for(var i=-1;i<=7;i++)if(!(t+i<=-1||this.moduleCount<=t+i))for(var s=-1;s<=7;s++)e+s<=-1||this.moduleCount<=e+s||(this.modules[t+i][e+s]=i>=0&&i<=6&&(0==s||6==s)||s>=0&&s<=6&&(0==i||6==i)||i>=2&&i<=4&&s>=2&&s<=4?!0:!1)},setupTimingPattern:function(){for(var t=8;t<this.moduleCount-8;t++)null==this.modules[t][6]&&(this.modules[t][6]=t%2==0);for(t=8;t<this.moduleCount-8;t++)null==this.modules[6][t]&&(this.modules[6][t]=t%2==0)},setupTypeInfo:function(){for(var t=0;t<15;t++){var e=1==(21522>>t&1);t<6?this.modules[t][8]=e:t<8?this.modules[t+1][8]=e:this.modules[this.moduleCount-15+t][8]=e}for(t=0;t<15;t++){e=1==(21522>>t&1);t<8?this.modules[8][this.moduleCount-t-1]=e:t<9?this.modules[8][15-t-1+1]=e:this.modules[8][15-t-1]=e}this.modules[this.moduleCount-8][8]=!1},mapData:function(t,e){for(var i=-1,s=this.moduleCount-1,o=7,n=0,h=this.moduleCount-1;h>0;h-=2)for(6==h&&h--;;){for(var r=0;r<2;r++)if(null==this.modules[s][h-r]){var a=!1;n<t.length&&(a=1==(t.charCodeAt(n)>>>o&1)),(s+h-r)%2==0&&!a&&(a=!a),this.modules[s][h-r]=a,o--,-1==o&&(n++,o=7)}if((s+=i)<0||this.moduleCount<=s){s-=i,i=-i;break}}},createCanvas:function(){var t=document.createElement("canvas"),e=this.moduleCount,i=4;t.width=t.height=e*i;var s=t.getContext("2d");for(var o=0;o<e;o++)for(var n=0;n<e;n++)s.fillStyle=this.modules[o][n]?"#000":"#fff",s.fillRect(n*i,o*i,i);return t}};window.QRCode=function(t){var e=new e(10,0);e.addData(t.text),e.make();var i=e.createCanvas();i.style.width=t.width+"px",i.style.height=t.height+"px",t._el.appendChild(i)}})();
+</script>
 
-// App Logic
+<script>
 let currentType = 'url';
 updateInputArea();
 
@@ -179,7 +183,7 @@ document.querySelectorAll('.tab').forEach(tab => {
 function updateInputArea() {
   const area = document.getElementById('input-area');
   area.innerHTML = currentType === 'url'
-   ? `<div class="input-group"><label>URL</label><input type="url" id="qr-input" placeholder="https://example.com" value="https://ziakhan-website.github.io/New-QR-GENERATOR/"></div>`
+  ? `<div class="input-group"><label>URL</label><input type="url" id="qr-input" placeholder="https://example.com" value="https://ziakhan-website.github.io/New-QR-GENERATOR/"></div>`
     : `<div class="input-group"><label>Text</label><textarea id="qr-input" placeholder="Enter text" rows="4">Hello World</textarea></div>`;
 }
 
@@ -199,6 +203,7 @@ function generateQR() {
     container.innerHTML = '';
     document.getElementById('qr-preview').style.display = 'block';
 
+    // Correct API for qrcodejs
     new QRCode({
       text: data,
       width: size,
