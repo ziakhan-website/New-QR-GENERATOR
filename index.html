@@ -3,85 +3,32 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>QR Infinity Pro</title>
+<title>QR Generator</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap');
-
-* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Space Grotesk', sans-serif; }
-
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
 body {
-  background: linear-gradient(135deg, #0f0f1a 0%, #1e1b4b 100%);
+  background: #0f0f1a;
   color: #fff;
-  min-height: 100vh;
   padding: 20px;
   display: flex;
   justify-content: center;
 }
-
 .container {
   width: 100%;
-  max-width: 700px;
-}
-
-.glass-card {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(40px);
-  border-radius: 32px;
+  max-width: 600px;
+  background: rgba(255,255,255,0.05);
   padding: 40px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  border: 1px solid rgba(255,255,255,0.1);
 }
-
 h1 {
-  font-size: 36px;
-  font-weight: 700;
+  font-size: 32px;
+  margin-bottom: 30px;
   background: linear-gradient(135deg, #fff, #c4b5fd);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  margin-bottom: 8px;
 }
-
-.pro-badge {
-  padding: 6px 14px;
-  background: linear-gradient(135deg, #6366f1, #d946ef);
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
-  margin-left: 12px;
-}
-
-.tabs {
-  display: flex;
-  gap: 10px;
-  margin: 30px 0;
-  overflow-x: auto;
-}
-.tab {
-  padding: 12px 24px;
-  border-radius: 16px;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.1);
-  color: #a1a1aa;
-  cursor: pointer;
-  white-space: nowrap;
-}
-.tab.active {
-  background: linear-gradient(135deg, #6366f1, #d946ef);
-  color: white;
-}
-
-.input-group { margin-bottom: 20px; }
-.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-
-label {
-  display: block;
-  font-size: 11px;
-  color: #a1a1aa;
-  margin-bottom: 8px;
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
-}
-
-input, select, textarea {
+input {
   width: 100%;
   padding: 16px;
   border-radius: 16px;
@@ -89,164 +36,88 @@ input, select, textarea {
   background: rgba(255,255,255,0.05);
   color: #fff;
   font-size: 15px;
+  margin-bottom: 20px;
 }
-
-.btn {
+button {
+  width: 100%;
   padding: 18px;
-  border-radius: 18px;
+  border-radius: 16px;
   border: none;
+  background: linear-gradient(135deg, #6366f1, #d946ef);
+  color: white;
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
-  width: 100%;
-  margin-top: 15px;
-  background: linear-gradient(135deg, #6366f1, #d946ef);
-  color: white;
 }
-
-.qr-preview {
+.qr-box {
   background: white;
   padding: 30px;
-  border-radius: 24px;
-  display: none;
+  border-radius: 20px;
   margin-top: 30px;
   text-align: center;
+  display: none;
 }
-
-.alert {
-  padding: 14px 18px;
-  border-radius: 14px;
+.error {
+  color: #fca5a5;
   margin-top: 15px;
   display: none;
-  background: rgba(239, 68, 68, 0.1);
-  border: 1px solid rgba(239, 68, 68, 0.3);
-  color: #fca5a5;
 }
 </style>
 </head>
 <body>
 <div class="container">
-  <div class="glass-card">
-    <h1>QR Infinity Pro <span class="pro-badge">PRO</span></h1>
-    <p class="subtitle" style="color:#a1a1aa; margin-bottom:30px;">Generate QR codes that actually work</p>
+  <h1>QR Generator</h1>
+  
+  <input type="url" id="url" placeholder="Enter URL" value="https://ziakhan-website.github.io/New-QR-GENERATOR/">
+  <button onclick="makeQR()">Generate QR Code</button>
+  <div class="error" id="error"></div>
 
-    <div class="tabs">
-      <div class="tab active" data-type="url">URL</div>
-      <div class="tab" data-type="text">Text</div>
-    </div>
-
-    <div id="input-area"></div>
-
-    <div class="grid-2">
-      <div class="input-group">
-        <label>Size</label>
-        <select id="size">
-          <option value="512">512px</option>
-          <option value="1024" selected>1024px</option>
-          <option value="2048">2048px</option>
-        </select>
-      </div>
-      <div class="input-group">
-        <label>Color</label>
-        <input type="color" id="color1" value="#000">
-      </div>
-    </div>
-
-    <button class="btn" onclick="generateQR()">Generate QR Code</button>
-    <div class="alert" id="error-alert"></div>
-
-    <div class="qr-preview" id="qr-preview">
-      <div id="qr-container"></div>
-    </div>
+  <div class="qr-box" id="qr-box">
+    <div id="qrcode"></div>
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+
 <script>
-/* Load QR Library with fallback */
-function loadScript(url, callback) {
-  const script = document.createElement('script');
-  script.src = url;
-  script.onload = callback;
-  script.onerror = () => {
-    if (url.includes('cdnjs')) {
-      loadScript('https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js', callback);
-    } else {
-      showError('QR Library load nahi hui. Internet check karo.');
-    }
-  };
-  document.head.appendChild(script);
-}
-
-let currentType = 'url';
-updateInputArea();
-
-document.querySelectorAll('.tab').forEach(tab => {
-  tab.onclick = () => {
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    tab.classList.add('active');
-    currentType = tab.dataset.type;
-    updateInputArea();
+function makeQR() {
+  const url = document.getElementById('url').value;
+  const errorDiv = document.getElementById('error');
+  const qrBox = document.getElementById('qr-box');
+  const qrContainer = document.getElementById('qrcode');
+  
+  errorDiv.style.display = 'none';
+  qrBox.style.display = 'none';
+  qrContainer.innerHTML = '';
+  
+  if(!url) {
+    errorDiv.textContent = 'Please enter a URL';
+    errorDiv.style.display = 'block';
+    return;
   }
-});
-
-function updateInputArea() {
-  const area = document.getElementById('input-area');
-  area.innerHTML = currentType === 'url'
-    ? `<div class="input-group"><label>URL</label><input type="url" id="qr-input" placeholder="https://example.com" value="https://ziakhan-website.github.io/New-QR-GENERATOR/"></div>`
-    : `<div class="input-group"><label>Text</label><textarea id="qr-input" placeholder="Enter text" rows="4">Hello World</textarea></div>`;
-}
-
-function generateQR() {
-  if (typeof QRCode === 'undefined') {
-    showError('Library load ho rahi hai, 2 sec wait karke dobara try karo.');
+  
+  if(typeof QRCode === 'undefined') {
+    errorDiv.textContent = 'Library load nahi hui. Page refresh karo.';
+    errorDiv.style.display = 'block';
     return;
   }
   
   try {
-    hideError();
-    const data = document.getElementById('qr-input').value;
-    if(!data) {
-      showError('Please enter data first');
-      return;
-    }
-
-    const size = parseInt(document.getElementById('size').value);
-    const color1 = document.getElementById('color1').value;
-
-    const container = document.getElementById('qr-container');
-    container.innerHTML = '';
-    document.getElementById('qr-preview').style.display = 'block';
-
-    // This is the correct API for qrcode@1.5.3
-    QRCode.toCanvas(container, data, {
-      width: size,
-      color: {
-        dark: color1,
-        light: '#ffffff'
-      },
-      margin: 2,
-      errorCorrectionLevel: 'M'
+    new QRCode(qrContainer, {
+      text: url,
+      width: 256,
+      height: 256,
+      colorDark: "#000",
+      colorLight: "#ffffff",
+      correctLevel: QRCode.CorrectLevel.M
     });
-
+    
+    qrBox.style.display = 'block';
   } catch(e) {
-    showError('Error: ' + e.message);
+    errorDiv.textContent = 'Error: ' + e.message;
+    errorDiv.style.display = 'block';
   }
 }
-
-function showError(msg) {
-  const alert = document.getElementById('error-alert');
-  alert.textContent = msg;
-  alert.style.display = 'block';
-}
-
-function hideError() {
-  document.getElementById('error-alert').style.display = 'none';
-}
-
-// Load library on page load
-loadScript('https://cdnjs.cloudflare.com/ajax/libs/qrcode/1.5.3/qrcode.min.js', () => {
-  console.log('QR Library loaded successfully');
-});
 </script>
 </body>
 </html>
