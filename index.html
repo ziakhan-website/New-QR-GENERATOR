@@ -2,7 +2,6 @@
 let currentType = 'url';
 let logoData = null;
 let generatedCount = parseInt(localStorage.getItem('qr_count') || 0);
-let scans = parseInt(localStorage.getItem('qr_scans') || 0);
 
 updateInputArea();
 updateStats();
@@ -22,8 +21,6 @@ document.getElementById('logo-upload').onchange = (e) => {
     const reader = new FileReader();
     reader.onload = (e) => {
       logoData = e.target.result;
-      document.getElementById('qr-logo').src = logoData;
-      document.getElementById('qr-logo').style.display = 'block';
     };
     reader.readAsDataURL(file);
   }
@@ -32,7 +29,7 @@ document.getElementById('logo-upload').onchange = (e) => {
 function updateInputArea() {
   const area = document.getElementById('input-area');
   const templates = {
-    url: `<div class="input-group"><label>URL</label><input type="url" id="qr-input" placeholder="https://example.com"></div>`,
+    url: `<div class="input-group"><label>URL</label><input type="url" id="qr-input" placeholder="https://example.com" value="https://ziakhan-website.github.io/New-QR-GENERATOR/"></div>`,
     text: `<div class="input-group"><label>Text</label><textarea id="qr-input" placeholder="Your text"></textarea></div>`,
     wifi: `<div class="input-group"><label>SSID</label><input type="text" id="wifi-ssid"></div>
            <div class="input-group"><label>Password</label><input type="text" id="wifi-pass"></div>
@@ -46,28 +43,36 @@ function updateInputArea() {
             <div class="input-group"><label>Company</label><input type="text" id="vcard-org"></div>`,
     bulk: `<div class="input-group">
              <label>Upload CSV</label>
-             <div class="file-drop" onclick="document.getElementById('csv-upload').click()">
-               Upload CSV: name,url per line
-               <input type="file" id="csv-upload" accept=".csv" style="display:none">
-             </div>
+             <input type="file" id="csv-upload" accept=".csv">
            </div>`
   };
-  area.innerHTML = templates[currentType];
+  area.innerHTML = templates[currentType] || templates['url'];
 }
 
 function getQRData() {
   if(currentType === 'url' || currentType === 'text') {
-    return document.getElementById('qr-input').value;
+    return document.getElementById('qr-input')?.value || '';
   }
   if(currentType === 'wifi') {
-    return `WIFI:S:${document.getElementById('wifi-ssid').value};T:${document.getElementById('wifi-type').value};P:${document.getElementById('wifi-pass').value};;`;
+    const ssid = document.getElementById('wifi-ssid')?.value || '';
+    const pass = document.getElementById('wifi-pass')?.value || '';
+    const type = document.getElementById('wifi-type')?.value || 'WPA';
+    return `WIFI:S:${ssid};T:${type};P:${pass};;`;
   }
   if(currentType === 'email') {
-    return `mailto:${document.getElementById('email-to').value}?subject=${encodeURIComponent(document.getElementById('email-subject').value)}&body=${encodeURIComponent(document.getElementById('email-body').value)}`;
+    const to = document.getElementById('email-to')?.value || '';
+    const subject = document.getElementById('email-subject')?.value || '';
+    const body = document.getElementById('email-body')?.value || '';
+    return `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   }
   if(currentType === 'vcard') {
-    return `BEGIN:VCARD\nVERSION:3.0\nFN:${document.getElementById('vcard-name').value}\nTEL:${document.getElementById('vcard-phone').value}\nEMAIL:${document.getElementById('vcard-email').value}\nORG:${document.getElementById('vcard-org').value}\nEND:VCARD`;
+    const name = document.getElementById('vcard-name')?.value || '';
+    const phone = document.getElementById('vcard-phone')?.value || '';
+    const email = document.getElementById('vcard-email')?.value || '';
+    const org = document.getElementById('vcard-org')?.value || '';
+    return `BEGIN:VCARD\nVERSION:3.0\nFN:${name}\nTEL:${phone}\nEMAIL:${email}\nORG:${org}\nEND:VCARD`;
   }
+  return '';
 }
 
 async function generateQR() {
@@ -78,34 +83,19 @@ async function generateQR() {
     }
 
     let data = getQRData();
-    if(!data) return alert('Enter data first');
+    if(!data) {
+      alert('Enter data first');
+      return;
+    }
 
-    const pass = document.getElementById('qr-pass').value;
-    const expiry = document.getElementById('qr-expiry').value;
-
-    if(pass) data = `PROTECTED:${btoa(pass)}:${data}`;
-    if(expiry) data = `EXPIRES:${new Date(expiry).getTime()}:${data}`;
-
-    const size = parseInt(document.getElementById('size').value);
-    const error = document.getElementById('error').value;
-    const style = document.getElementById('style').value;
-    const color1 = document.getElementById('color1').value;
-    const color2 = document.getElementById('color2').value;
-    const frame = document.getElementById('frame').value;
+    const size = parseInt(document.getElementById('size')?.value || 1024);
+    const error = document.getElementById('error')?.value || 'M';
+    const color1 = document.getElementById('color1')?.value || '#000';
 
     const container = document.getElementById('qr-container');
     container.innerHTML = '';
     document.getElementById('qr-wrapper').style.display = 'block';
 
-    if(frame!== 'none') {
-      document.getElementById('qr-frame').style.display = 'block';
-      if(frame === 'text') {
-        document.getElementById('frame-text').style.display = 'block';
-        document.getElementById('frame-text').textContent = 'Scan Me';
-      }
-    }
-
-    // Solid color hi use karo. Gradient hata diya taaki CORS error na aaye
     await QRCode.toCanvas(container, data, {
       width: size,
       errorCorrectionLevel: error,
@@ -114,8 +104,6 @@ async function generateQR() {
     });
 
     document.getElementById('actions').style.display = 'grid';
-    document.getElementById('stats').style.display = 'grid';
-
     generatedCount++;
     localStorage.setItem('qr_count', generatedCount);
     updateStats();
@@ -128,21 +116,18 @@ async function generateQR() {
   }
 }
 
-// Gradient function hata diya kyunki ye CORS error deta hai
-// Agar gradient chahiye to canvas ko image me convert karke CSS filter use karo
-
 function downloadPNG() {
   const canvas = document.querySelector('#qr-container canvas');
-  if(!canvas) return;
+  if(!canvas) return alert('Pehle QR generate karo');
   const link = document.createElement('a');
   link.download = `qr_${Date.now()}.png`;
   link.href = canvas.toDataURL();
   link.click();
-  updateSavedStat();
 }
 
 function downloadSVG() {
   const data = getQRData();
+  if(!data) return alert('Pehle QR generate karo');
   QRCode.toString(data, {type: 'svg'}, (err, svg) => {
     if(err) return alert(err);
     const blob = new Blob([svg], {type: 'image/svg+xml'});
@@ -155,7 +140,7 @@ function downloadSVG() {
 
 function copyQR() {
   const canvas = document.querySelector('#qr-container canvas');
-  if(!canvas) return;
+  if(!canvas) return alert('Pehle QR generate karo');
   canvas.toBlob(blob => {
     navigator.clipboard.write([new ClipboardItem({'image/png': blob})]);
     alert('Copied to clipboard!');
@@ -164,13 +149,13 @@ function copyQR() {
 
 function shareQR() {
   const canvas = document.querySelector('#qr-container canvas');
-  if(!canvas) return;
+  if(!canvas) return alert('Pehle QR generate karo');
   canvas.toBlob(async blob => {
     const file = new File([blob], 'qr.png', {type: 'image/png'});
     if(navigator.share) {
       await navigator.share({files: [file], title: 'QR Code'});
     } else {
-      alert('Share not supported');
+      alert('Share not supported on this browser');
     }
   });
 }
@@ -180,8 +165,10 @@ async function downloadZIP() {
     alert('JSZip load nahi hui');
     return;
   }
-  const zip = new JSZip();
   const canvas = document.querySelector('#qr-container canvas');
+  if(!canvas) return alert('Pehle QR generate karo');
+
+  const zip = new JSZip();
   const blob = await new Promise(resolve => canvas.toBlob(resolve));
   zip.file('qr_code.png', blob);
   zip.file('README.txt', 'Generated by QR Infinity Pro');
@@ -196,30 +183,13 @@ async function downloadZIP() {
 function clearAll() {
   document.getElementById('qr-wrapper').style.display = 'none';
   document.getElementById('actions').style.display = 'none';
-  document.getElementById('qr-frame').style.display = 'none';
-  document.getElementById('frame-text').style.display = 'none';
-  document.getElementById('qr-logo').style.display = 'none';
+  document.getElementById('qr-container').innerHTML = '';
   logoData = null;
 }
 
 function updateStats() {
   document.getElementById('stat-total').textContent = generatedCount;
-  document.getElementById('stat-scans').textContent = scans;
-  document.getElementById('stat-saved').textContent = localStorage.getItem('qr_saved') || 0;
 }
 
-function updateSavedStat() {
-  let saved = parseInt(localStorage.getItem('qr_saved') || 0);
-  saved++;
-  localStorage.setItem('qr_saved', saved);
-  updateStats();
-}
-
-setInterval(() => {
-  if(Math.random() > 0.7) {
-    scans++;
-    localStorage.setItem('qr_scans', scans);
-    updateStats();
-  }
-}, 10000);
+// Remove gradient function completely - it causes CORS errors
 </script>
